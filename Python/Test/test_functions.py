@@ -18,16 +18,14 @@ run_random_write = 0
 if run_random_write:
     range_rand = [1, 3]
     random = np.random.uniform(*range_rand, 20)
+
 with open('asset_02.txt', 'w+' if run_random_write else 'r') as file:
     file.write(str(random)) if run_random_write else None
     file.seek(0)
     from_, to_= 0 , None
     data = [float(num) for num in file.read().strip()[from_:to_].split()]
 
-print(data)
-
 data_2 = mod_array(data, 'rec', 0, len(data), 'group_num', 2)
-print(data_2)
 
 difference = [diff(sub[-1], sub[0]) for sub in data_2]
 pos_change = abv_bel(0, difference, 1, False)

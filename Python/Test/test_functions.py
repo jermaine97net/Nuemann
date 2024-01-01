@@ -40,8 +40,8 @@ neg_tend = central_ten(abs_dev, neg_change)
 pos_tend_dev = abs_dev(pos_tend, pos_change)
 neg_tend_dev = abs_dev(neg_tend, neg_change)
 
-pos_distribution = [np.diff([pos_tend_dev, pos_tend]), pos_tend, sum([pos_tend, pos_tend_dev])]
-neg_distribution = [np.diff([neg_tend_dev, neg_tend]), neg_tend, sum([neg_tend, neg_tend_dev])]
+pos_distribution = [diff(pos_tend, pos_tend_dev), pos_tend, sum([pos_tend, pos_tend_dev])]
+neg_distribution = [diff(neg_tend, neg_tend_dev), neg_tend, sum([neg_tend, neg_tend_dev])]
 
 variables = {'difference': difference, 'pos_change': pos_change, 'neg_change': neg_change,
              'pos_prob': pos_prob, 'neg_prob': neg_prob, 'pos_tend': pos_tend, 'neg_tend': neg_tend,

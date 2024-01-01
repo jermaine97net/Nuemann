@@ -1,6 +1,4 @@
 import random
-import yfinance as fin
-import numpy as np
 
 run_read = 0
 
@@ -20,17 +18,24 @@ pos_distr = [0.5, 1.5]
 neg_distr = [-1.5, -0.5]
 
 events = 4
-num_forecasts = 3
+num_forecasts = 10
 first_val = 0
 
 def forecast():
-  forecast_ , changes = []
-  def rand():
-    return random.uniform(*pos_distr) if random.random() >= random.uniform(*prob) else random.uniform(*neg_distr)
-  for i in range(events):
-    changes.append(i)
-    forecast_.append(first_val + sum(changes[:i+1]))
-  return forecast_
+    forecast_ = [first_val]
+    rand = lambda: random.uniform(*pos_distr) if random.random() <= random.uniform(*prob) else random.uniform(*neg_distr)
+    for _ in range(events):
+        forecast_.append(forecast_[-1] + rand())
+    return forecast_
+
+from multiprocessing import Pool
+
+def generate_forecasts(num_forecasts):
+    with Pool() as p:
+        forecasts = p.map(forecast, range(num_forecasts))
+    return forecasts
+
+forecasts = generate_forecasts(num_forecasts)
 
 # print(f'forecasts {forecasts}')
 # print(forecasts)

@@ -25,14 +25,14 @@ def rand():
   return random.uniform(*pos_distr) if random.random()>= random.uniform(*prob) else random.uniform(*neg_distr)
 
 arr = []
-val_2=[]
+forecasts=[]
 first_val=0
 for i in range(events):
     arr.append(rand())
-    val_2.append(first_val+sum(arr[:i+1]))
+    forecasts.append(first_val+sum(arr[:i+1]))
     print(f'## arr {arr}')
-    print(val_2)
-# print(f'val_2 {val_2}')
+    print(forecasts)
+# print(f'forecasts {forecasts}')
 # print(forecasts)
 
 # print(sum_arr)

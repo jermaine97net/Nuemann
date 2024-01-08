@@ -12,34 +12,36 @@ if activate_file:
     import matplotlib.pyplot as plt
     import pandas as pd
 
-    start_index = 200
-    end_index = 390
+    start_index = 50
+    end_index = 250
 
-    data = tsla_data[start_index:end_index]
+    data_analysis = tsla_data[start_index:end_index]
     	
-    first_val = data[0]
-    events = end_index - start_index
-    number_sub = 100
-    
-    pos_change_dist = change_distribution(data,1,1,'distr')[0]
+    pos_change_dist = change_distribution(data_analysis,1,1,'distr')[0]
     pos_change_range = [pos_change_dist[0], pos_change_dist[-1]]
-    neg_change_range = change_distribution(data,1,-1,'distr')[0]
+    neg_change_range = change_distribution(data_analysis,1,-1,'distr')[0]
     neg_change_range = [neg_change_range[0], neg_change_range[-1]]
 
-    data_distribution = distribution_func(data,1,'distr')[0]
+    data_analysis_distribution = distribution_func(data_analysis,1,'distr')[0]
 
-    pos_prob = change_prob(data,1)
+    pos_prob = change_prob(data_analysis,1)
 
-    print('f The pos change probability from {start_index} to {end_index} is : {pos_prob} \n')
+    print(f' The pos change probability of data_analysis({start_index},{end_index}) is : {pos_prob}')
     print(f'The positive change range is: {pos_change_range}')
     print(f'The negative change range is: {neg_change_range}')
-    print(f'The distribution of the data is: {data_distribution} \n')
+    print(f'The distribution of data_analysis({start_index},{end_index}) is: {data_analysis_distribution} \n')
 
 
     # region forceast generation
-    dynamic_modulator, defualt_pos_prob , = 0.01, 0.5
+    forecast_start = end_index
+    first_val = tsla_data[end_index]
 
+    events = len(tsla_data) - forecast_start
+    number_sub = 100
+  
+    dynamic_modulator, defualt_pos_prob , = 0.01, 0.5
     is_dynamic, is_default = 0, 0
+
     if is_dynamic:
         if is_default == False:
             pos_prob_range = (pos_prob - dynamic_modulator, pos_prob + dynamic_modulator) 
@@ -53,28 +55,29 @@ if activate_file:
     
 
     # region forecasts analysis
-    forecasts = pd.DataFrame(gen_forecasts(rand_gen,first_val, events, number_sub, True))
-    forecast_func = lambda data: distribution_func(data,1, 'distr')[0]
-    applied_forecasts = forecasts.apply(forecast_func, axis=0)
-    print(f'The distribution of the forecasts is: {applied_forecasts} \n')
-
-    data_function = lambda data: distribution_func(data,1, 'distr')[0]
-    applied_data = forecasts.apply(data_function, axis=0)
+    is_data_frame = 0
+    if is_data_frame:
+        forecasts = pd.DataFrame(gen_forecasts(rand_gen,first_val, events, number_sub, True))
+        forecast_func = lambda data_analysis: distribution_func(data_analysis,1, 'distr')[0]
+        forecast_analysis = forecasts.apply(forecast_func, axis=0)
+    else:
+        forecasts =  np.array(gen_forecasts(rand_gen,first_val, events, number_sub, True))
+        forecast_distribution = distribution_func(forecasts,1, 'distr')[0]
     # endregion
 
 
     # region plot
-    start_x = start_index + 1
-    x = np.arange(start_x, start_x + len(data))
-
+        
     # Plot forecasts
-    plt.plot(x,forecasts.T, color = 'grey')
-    plt.plot(x,applied_data.T, color = 'blue')
+    start_x = forecast_start
+    x = np.arange(start_x, start_x + events)
+    plt.plot(x,forecasts.T, color = 'lightgrey', linestyle='--', linewidth = 0.5)
+    plt.plot(forecast_distribution, color = 'red', linestyle='-', linewidth = 0.5)
 
-    # Plot data
+    # Plot data_analysis
     plt.plot(np.array(tsla_data), color = 'green')
-    for val in data_distribution:
-        plt.hlines(y=val, xmin=start_x, xmax=start_x + len(data), color='red')
+    # for val in data_analysis_distribution:
+    #     plt.hlines(y=val, xmin=start_x, xmax=start_x + len(data_analysis), color='red')
 
     # endregion
     plt.show()

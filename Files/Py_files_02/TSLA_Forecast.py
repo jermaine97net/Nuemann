@@ -54,44 +54,4 @@ if activate_file:
     # endregion
     
 
-    # region forecasts analysis
-    forecasts = gen_forecasts(rand_gen,first_val, events, number_sub, True)
-
-    analysis_type, dev_type, axis_val = 'tend', 1, 0
-    is_static_analysis = 1
-    conditional_data = np.concatenate(forecasts) if is_static_analysis else pd.DataFrame(forecasts)
-
-    dynamic_func = lambda data_analysis: distribution_func(data_analysis,dev_type, analysis_type)
-    static_func = distribution_func(conditional_data,dev_type,analysis_type)
-
-    if is_static_analysis:
-        forecast_analysis = static_func[0] if analysis_type == 'distr' else static_func
-    else: conditional_data.apply(dynamic_func, axis=axis_val)[0] if analysis_type == 'distr' else conditional_data.apply(dynamic_func, axis=axis_val)
-
-    # endregion
-
-
-    # region plot
-        
-    # Plot forecasts
-    plot_forecast = 1
-    if plot_forecast:
-        start_x = forecast_start
-        x = np.arange(start_x, start_x + events)
-        plt.plot(x,forecasts.T, color = 'lightgrey', linestyle='--', linewidth = 0.5)
-        # plt.plot(x, *forecast_moving_distribution, color = 'red', linewidth = 0.5)
-        try:
-            for val in forecast_distribution:
-                plt.hlines(y=val, xmin=start_x, xmax=start_x + events, color='red',linestyle= '--', linewidth = 0.5)
-        except ValueError:
-                plt.hlines(y=forecast_distribution, xmin=start_x, xmax=start_x + events, color='red',linestyle= '--', linewidth = 0.5)
-    
-    # Plot data_analysis
-    plot_data_analysis = 1
-    if plot_data_analysis:
-        plt.plot(np.array(tsla_data), color = 'green')
-    # for val in data_analysis_distribution:
-    #     plt.hlines(y=val, xmin=start_x, xmax=start_x + len(data_analysis), color='red')
-
-    # endregion
    

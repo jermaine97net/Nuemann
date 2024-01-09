@@ -40,7 +40,7 @@ if activate_file:
     number_sub = 100
   
     dynamic_modulator, defualt_pos_prob , = 0.1, 0.5
-    is_dynamic, is_default = 0, 0
+    is_dynamic, is_default = 0, 1
 
     if is_dynamic:
         if is_default == False:
@@ -55,15 +55,19 @@ if activate_file:
     
 
     # region forecasts analysis
-    is_data_frame = 1
-    if is_data_frame:
-        forecasts = pd.DataFrame(gen_forecasts(rand_gen,first_val, events, number_sub, True))
-        forecast_func = lambda data_analysis: distribution_func(data_analysis,1, 'conc distr')
-        forecast_moving_distribution = forecasts.apply(forecast_func, axis=0)
-    else:
-        forecasts =  np.array(gen_forecasts(rand_gen,first_val, events, number_sub, True))
-        forecast_moving_distribution = np.array(distribution_func(data,1, 'distr') for data in np.transpose(forecasts))
-        print(f'The distribution of forecasts is: {forecast_moving_distribution} \n')
+    forecasts = gen_forecasts(rand_gen,first_val, events, number_sub, True)
+
+    analysis_type, dev_type, axis_val = 'tend', 1, 0
+    is_static_analysis = 1
+    conditional_data = np.concatenate(forecasts) if is_static_analysis else pd.DataFrame(forecasts)
+
+    dynamic_func = lambda data_analysis: distribution_func(data_analysis,dev_type, analysis_type)
+    static_func = distribution_func(conditional_data,dev_type,analysis_type)
+
+    if is_static_analysis:
+        forecast_analysis = static_func[0] if analysis_type == 'distr' else static_func
+    else: conditional_data.apply(dynamic_func, axis=axis_val)[0] if analysis_type == 'distr' else conditional_data.apply(dynamic_func, axis=axis_val)
+
     # endregion
 
 
@@ -75,8 +79,13 @@ if activate_file:
         start_x = forecast_start
         x = np.arange(start_x, start_x + events)
         plt.plot(x,forecasts.T, color = 'lightgrey', linestyle='--', linewidth = 0.5)
-        plt.plot(x, forecast_moving_distribution.T, color = 'red', linewidth = 0.5)
-
+        # plt.plot(x, *forecast_moving_distribution, color = 'red', linewidth = 0.5)
+        try:
+            for val in forecast_distribution:
+                plt.hlines(y=val, xmin=start_x, xmax=start_x + events, color='red',linestyle= '--', linewidth = 0.5)
+        except ValueError:
+                plt.hlines(y=forecast_distribution, xmin=start_x, xmax=start_x + events, color='red',linestyle= '--', linewidth = 0.5)
+    
     # Plot data_analysis
     plot_data_analysis = 1
     if plot_data_analysis:

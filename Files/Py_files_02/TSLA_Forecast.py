@@ -13,7 +13,7 @@ if activate_file:
     import pandas as pd
 
     start_index = 0
-    end_index = 100
+    end_index = 250
 
     data_analysis = tsla_data[start_index:end_index]
     	
@@ -39,13 +39,13 @@ if activate_file:
     events = len(tsla_data) - forecast_start
     number_sub = 100
   
-    dynamic_modulator, defualt_pos_prob , = 0.01, 0.5
+    dynamic_modulator, defualt_pos_prob , = 0.1, 0.5
     is_dynamic, is_default = 0, 0
 
     if is_dynamic:
         if is_default == False:
             pos_prob_range = (pos_prob - dynamic_modulator, pos_prob + dynamic_modulator) 
-        else: pos_change_range = (defualt_pos_prob + dynamic_modulator, defualt_pos_prob + dynamic_modulator)
+        else: pos_prob_range = (defualt_pos_prob + dynamic_modulator, defualt_pos_prob + dynamic_modulator)
     else:
         pos_prob_range = (pos_prob, pos_prob) if is_default == False else (defualt_pos_prob, defualt_pos_prob)
     
@@ -55,14 +55,14 @@ if activate_file:
     
 
     # region forecasts analysis
-    is_data_frame = 0
+    is_data_frame = 1
     if is_data_frame:
         forecasts = pd.DataFrame(gen_forecasts(rand_gen,first_val, events, number_sub, True))
-        forecast_func = lambda data_analysis: distribution_func(data_analysis,1, 'distr')[0]
+        forecast_func = lambda data_analysis: distribution_func(data_analysis,1, 'conc distr')
         forecast_moving_distribution = forecasts.apply(forecast_func, axis=0)
     else:
         forecasts =  np.array(gen_forecasts(rand_gen,first_val, events, number_sub, True))
-        forecast_moving_distribution = tuple(distribution_func(data,1, 'distr') for data in forecasts)
+        forecast_moving_distribution = np.array(distribution_func(data,1, 'distr') for data in np.transpose(forecasts))
         print(f'The distribution of forecasts is: {forecast_moving_distribution} \n')
     # endregion
 
@@ -70,15 +70,15 @@ if activate_file:
     # region plot
         
     # Plot forecasts
-    plot_forecast = 0
+    plot_forecast = 1
     if plot_forecast:
         start_x = forecast_start
         x = np.arange(start_x, start_x + events)
         plt.plot(x,forecasts.T, color = 'lightgrey', linestyle='--', linewidth = 0.5)
-        plt.plot(forecast_moving_distribution, color = 'red', linestyle='-', linewidth = 0.5)
+        plt.plot(x, forecast_moving_distribution.T, color = 'red', linewidth = 0.5)
 
     # Plot data_analysis
-    plot_data_analysis = 0
+    plot_data_analysis = 1
     if plot_data_analysis:
         plt.plot(np.array(tsla_data), color = 'green')
     # for val in data_analysis_distribution:
